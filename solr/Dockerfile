@@ -4,23 +4,41 @@ RUN apk add --no-cache git
 ARG GIT_REVISION
 ARG GIT_REPO_URL
 
+WORKDIR /root/
+
 RUN set -ex \
   && git clone $GIT_REPO_URL repo -b $GIT_REVISION --depth 1
 
+WORKDIR repo/solr/config
+
+# Copy in solrconfig.xml
+RUN ls -d cores/*/conf | xargs -I{ cp solrconfig.xml {/
+# Or softlink?
+# RUN ls -d cores/*/conf | xargs -I{ ln -s ../../../gup-config/solrconfig.xml {/solrconfig.xml
+
 FROM solr:5.5.5
 
-# TODO: Perform below steps in intermediate container
-COPY --from=repo ./solr/config /opt/solr/
+ENV GUP_SOLR_CONF_PATH="/opt/solr/gup-config"
 
-WORKDIR /opt/solr/config
-# TODO: bash -iex stuff
-RUN envsubst < core.properties.envsubst | tee $(ls -d cores/* | sed 's/$/\/core.propeties/') > /dev/null
-# TODO: Copy solrconfig or softlink?
-RUN 
+USER root
 
+RUN set -ex; \
+  apt-get update; \
+  apt-get -y install gettext-base; \
+  rm -rf /var/lib/apt/lists/*
 
-# REPLACE ENVIRONMENT VARIABLES IN .properties files
+USER $SOLR_USER
 
-# PRECREATE CORE, OR JUST COPY ALL?
+WORKDIR /opt/solr/dist
+# VERSION??
+RUN curl -O https://jdbc.postgresql.org/download/postgresql-42.2.6.jar
+WORKDIR /opt/solr
 
-# COPY --chown:solr:solr scripts
+COPY --from=repo /root/repo/solr/config /opt/solr/gup-config
+
+RUN ls "$GUP_SOLR_CONF_PATH/cores" | xargs -I{ precreate-core { "$GUP_SOLR_CONF_PATH/cores/"{
+
+COPY gup-solr-docker-entrypoint.sh /opt/docker-solr/scripts
+
+ENTRYPOINT ["gup-solr-docker-entrypoint.sh"]
+CMD ["solr-foreground"]

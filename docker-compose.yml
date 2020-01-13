@@ -6,7 +6,7 @@ services:
       - EMBER_ENVIRONMENT=${GUP_ENVIRONMENT}
       - GUP_SERVICE_PORT=${GUP_SERVICE_PORT}
     ports:
-      - "8181:8080"
+      - ${GUP_FRONTEND_PORT}:8080
   backend:
     build:
       context: ./backend
@@ -25,10 +25,10 @@ services:
       - GUP_MAIL_SMTP_HOST=${GUP_MAIL_SMTP_HOST}
       - GUP_MAIL_FROM=${GUP_MAIL_FROM}
       - GUP_MAIL_TO=${GUP_MAIL_TO}
-      - GUP_PUBLIC_BASE_URL=${GUP_PUBLIC_BASE_URL}
+      - GUP_PUBLIC_BASE_URL=http://localhost:${GUP_SERVICE_PORT}
       - GUP_REPOSITORY_NAME=${GUP_REPOSITORY_NAME}
       - GUP_OAI_REPOSITORY_NAME=${GUP_OAI_REPOSITORY_NAME}
-      - GUP_OAI_REPOSITORY_URL=${GUP_OAI_REPOSITORY_URL}
+      - GUP_OAI_REPOSITORY_URL=http://localhost:${GUP_SERVICE_PORT}/oai
       - GUP_OAI_RECORD_PREFIX=${GUP_OAI_RECORD_PREFIX}
       - GUP_MQ_BASE_URL=${GUP_MQ_BASE_URL}
       - GUP_MQ_API_KEY=${GUP_MQ_API_KEY}
@@ -63,7 +63,8 @@ services:
       - GUP_SOLR_DATA_IMPORT_DB_URL=jdbc:postgresql://db:5432/${GUP_DB}
       - GUP_SOLR_DATA_IMPORT_DB_USER=${GUP_DB_USER}
       - GUP_SOLR_DATA_IMPORT_DB_PASSWORD=${GUP_DB_PASSWORD}
-
+    networks:
+      - backend
 networks:
   backend:
 
