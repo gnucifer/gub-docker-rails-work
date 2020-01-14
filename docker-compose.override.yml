@@ -1,5 +1,9 @@
 version: '3.7'
 services:
+  #  frontend:
+  #    image: docker.ub.gu.se/ember-dev:3.14.0
+  #  backend:
+  #    image: docker.ub.gu.se/rails-dev:2.4
   solr:
     ports:
       - ${GUP_SOLR_PORT}:8983

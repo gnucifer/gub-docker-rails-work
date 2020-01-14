@@ -1,7 +1,11 @@
 version: '3.7'
 services:
   frontend:
-    image: docker.ub.gu.se/gup-ember:latest
+    build:
+      context: ./frontend
+      args:
+        - GIT_REPO_URL=https://github.com/gnucifer/gup.git
+        - GIT_REVISION=docker-friendly-config
     environment:
       - EMBER_ENVIRONMENT=${GUP_ENVIRONMENT}
       - GUP_SERVICE_PORT=${GUP_SERVICE_PORT}
@@ -65,6 +69,8 @@ services:
       - GUP_SOLR_DATA_IMPORT_DB_PASSWORD=${GUP_DB_PASSWORD}
     networks:
       - backend
+    depends_on:
+      - db
 networks:
   backend:
 

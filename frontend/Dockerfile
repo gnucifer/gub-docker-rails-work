@@ -1,0 +1,21 @@
+FROM alpine:latest AS release
+RUN apk add --no-cache git
+
+ARG GIT_REVISION
+ARG GIT_REPO_URL
+
+WORKDIR /root/
+
+RUN set -ex \
+  && git clone $GIT_REPO_URL release -b $GIT_REVISION --depth 1
+
+FROM docker.ub.gu.se/ember-deploy:3.14.0
+
+COPY --from=release /root/release/frontend /home/node/app
+
+WORKDIR /home/node/app
+
+RUN set -ex \
+  && npm install \
+  && bower install \
+  && npm update caniuse-lite browserslist
