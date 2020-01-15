@@ -1,22 +1,14 @@
 version: '3.7'
 services:
   frontend:
-    build:
-      context: ./frontend
-      args:
-        - GIT_REPO_URL=https://github.com/gnucifer/gup.git
-        - GIT_REVISION=docker-friendly-config
+    image: docker.ub.gu.se/gup-frontend:${GIT_REVISION}
     environment:
       - EMBER_ENVIRONMENT=${GUP_ENVIRONMENT}
       - GUP_SERVICE_PORT=${GUP_SERVICE_PORT}
     ports:
       - ${GUP_FRONTEND_PORT}:8080
   backend:
-    build:
-      context: ./backend
-      args:
-        - GIT_REPO_URL=https://github.com/gnucifer/gup.git
-        - GIT_REVISION=docker-friendly-config
+    image: docker.ub.gu.se/gup-backend:${GIT_REVISION}
     depends_on:
       - db
     environment:
@@ -58,11 +50,7 @@ services:
       placement:
         constraints: [node.role == manager]
   solr:
-    build:
-      context: ./solr
-      args:
-        - GIT_REPO_URL=https://github.com/gnucifer/gup.git
-        - GIT_REVISION=docker-friendly-config
+    image: docker.ub.gu.se/gup-solr:${GIT_REVISION}
     environment:
       - GUP_SOLR_DATA_IMPORT_DB_URL=jdbc:postgresql://db:5432/${GUP_DB}
       - GUP_SOLR_DATA_IMPORT_DB_USER=${GUP_DB_USER}
